@@ -249,7 +249,14 @@ function renderBoard() {
     ? (isMovement ? handlePositionClick : handleCellClick)
     : null;
   const uiState = isMovement
-    ? { selectedPiece: state.selectedPiece, validDests: state.validDests }
+    ? {
+        selectedPiece:   state.selectedPiece,
+        validDests:      state.validDests,
+        getValidDestsFor: (idx) => {
+          const moves = state.gameInstance.getValidMoves(state.gameState);
+          return moves.filter(m => m.from === idx).map(m => m.to);
+        },
+      }
     : undefined;
 
   const svg = state.boardRenderer(state.gameState, result, clickHandler, uiState);
@@ -268,7 +275,7 @@ function handleCellClick(cellIndex) {
   applyMove(cellIndex);
 }
 
-function handlePositionClick(idx) {
+function handlePositionClick(idx, dragTo = null) {
   if (state.isAIThinking) return;
   const result = state.gameInstance.checkResult(state.gameState);
   if (result.over) return;
@@ -276,6 +283,20 @@ function handlePositionClick(idx) {
   const board = state.gameState.board;
   const currentPlayer = state.gameState.currentPlayer;
 
+  // ── Drag completion: (from, to) passed directly ───────────────
+  if (dragTo !== null) {
+    if (board[idx] !== currentPlayer) return;
+    const validMoves = state.gameInstance.getValidMoves(state.gameState);
+    const dests = validMoves.filter(m => m.from === idx).map(m => m.to);
+    if (dests.includes(dragTo)) {
+      state.selectedPiece = null;
+      state.validDests = [];
+      applyMove({ from: idx, to: dragTo });
+    }
+    return;
+  }
+
+  // ── Click-click ───────────────────────────────────────────────
   if (state.selectedPiece === null) {
     if (board[idx] !== currentPlayer) return;
     state.selectedPiece = idx;
@@ -284,24 +305,20 @@ function handlePositionClick(idx) {
     renderBoard();
   } else {
     if (idx === state.selectedPiece) {
-      // Deselect
       state.selectedPiece = null;
       state.validDests = [];
       renderBoard();
     } else if (state.validDests.includes(idx)) {
-      // Execute move
       const from = state.selectedPiece;
       state.selectedPiece = null;
       state.validDests = [];
       applyMove({ from, to: idx });
     } else if (board[idx] === currentPlayer) {
-      // Switch selection to another own piece
       state.selectedPiece = idx;
       const validMoves = state.gameInstance.getValidMoves(state.gameState);
       state.validDests = validMoves.filter(m => m.from === idx).map(m => m.to);
       renderBoard();
     } else {
-      // Invalid click — deselect
       state.selectedPiece = null;
       state.validDests = [];
       renderBoard();
