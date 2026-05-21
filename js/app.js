@@ -233,6 +233,15 @@ function startRound() {
   }
 }
 
+// ─── INTERACTION MODE ────────────────────────────────────────
+function getCurrentInteractionMode() {
+  const game = state.gameInstance;
+  if (typeof game.getInteractionMode === 'function') {
+    return game.getInteractionMode(state.gameState);
+  }
+  return game.interactionMode ?? 'placement';
+}
+
 // ─── BOARD RENDERING ─────────────────────────────────────────
 function renderBoard() {
   if (!state.boardRenderer) return;
@@ -244,20 +253,28 @@ function renderBoard() {
     state.gameState.currentPlayer !== state.aiPlayer;
   const clickable = !result.over && !state.isAIThinking && humanTurn;
 
-  const isMovement = state.gameInstance.interactionMode === 'movement';
+  const interactionMode = getCurrentInteractionMode();
+  const isMovement = interactionMode === 'movement';
+  const isTapatanPlacement = !isMovement &&
+    state.gameInstance.boardConfig?.type === 'tapatan';
+
   const clickHandler = clickable
     ? (isMovement ? handlePositionClick : handleCellClick)
     : null;
-  const uiState = isMovement
-    ? {
-        selectedPiece:   state.selectedPiece,
-        validDests:      state.validDests,
-        getValidDestsFor: (idx) => {
-          const moves = state.gameInstance.getValidMoves(state.gameState);
-          return moves.filter(m => m.from === idx).map(m => m.to);
-        },
-      }
-    : undefined;
+
+  let uiState;
+  if (isMovement) {
+    uiState = {
+      selectedPiece:    state.selectedPiece,
+      validDests:       state.validDests,
+      getValidDestsFor: (idx) => {
+        const moves = state.gameInstance.getValidMoves(state.gameState);
+        return moves.filter(m => m.from === idx).map(m => m.to);
+      },
+    };
+  } else if (isTapatanPlacement) {
+    uiState = { phase: 'placement' };
+  }
 
   const svg = state.boardRenderer(state.gameState, result, clickHandler, uiState);
 

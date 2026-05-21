@@ -51,7 +51,8 @@ export const GAMES = [
     subcategory: 'Apenas Movimentação',
     origin: 'Quênia',
     description: 'Como Tapatan, mas o alinhamento vitorioso deve passar pelo centro.',
-    available: false,
+    available: true,
+    moduleLoader: () => import('./Game4.js'),
   },
   {
     id: 'tsoro-yematatu',
@@ -62,7 +63,8 @@ export const GAMES = [
     subcategory: 'Apenas Movimentação',
     origin: 'Zimbábue',
     description: 'Além de mover para vizinhos, permite saltar sobre peças em linha reta.',
-    available: false,
+    available: true,
+    moduleLoader: () => import('./Game5.js'),
   },
 
   // ─── ALINHAMENTO: Colocação e Movimentação ──────────────────
@@ -75,7 +77,8 @@ export const GAMES = [
     subcategory: 'Colocação e Movimentação',
     origin: null,
     description: 'Fase de colocação seguida de movimentação livre para qualquer posição vazia.',
-    available: false,
+    available: true,
+    moduleLoader: () => import('./Game6.js'),
   },
   {
     id: 'achi',
@@ -86,7 +89,8 @@ export const GAMES = [
     subcategory: 'Colocação e Movimentação',
     origin: 'Gana',
     description: 'Cada jogador tem 4 peças. Fase de colocação, depois movimentação pelas linhas.',
-    available: false,
+    available: true,
+    moduleLoader: () => import('./Game7.js'),
   },
   {
     id: 'achi3',
@@ -97,7 +101,8 @@ export const GAMES = [
     subcategory: 'Colocação e Movimentação',
     origin: 'Gana',
     description: 'Versão do Achi com 3 peças por jogador — mais dinâmico e veloz.',
-    available: false,
+    available: true,
+    moduleLoader: () => import('./Game8.js'),
   },
   {
     id: 'placement-center',
@@ -108,7 +113,8 @@ export const GAMES = [
     subcategory: 'Colocação e Movimentação',
     origin: null,
     description: 'Colocação seguida de movimentação; alinhamento válido deve passar pelo centro.',
-    available: false,
+    available: true,
+    moduleLoader: () => import('./Game9.js'),
   },
   {
     id: 'placement-jump',
@@ -119,7 +125,8 @@ export const GAMES = [
     subcategory: 'Colocação e Movimentação',
     origin: 'Zimbábue',
     description: 'Colocação seguida de movimentação com saltos — regras do Tsoro Yematatu.',
-    available: false,
+    available: true,
+    moduleLoader: () => import('./Game10.js'),
   },
 
   // ─── BLOQUEIO: Mu Torere ────────────────────────────────────
@@ -131,8 +138,9 @@ export const GAMES = [
     category: 'Bloqueio',
     subcategory: 'Mu Torere',
     origin: 'Nova Zelândia (Maori)',
-    description: 'Peças dispostas alternadamente. Bloqueie o adversário para vencer.',
-    available: false,
+    description: 'Peças dispostas alternadamente. Mova pelas linhas do tabuleiro. Quem não conseguir mover perde.',
+    available: true,
+    moduleLoader: () => import('./Game11.js'),
   },
   {
     id: 'mu-torere-2',
@@ -142,8 +150,9 @@ export const GAMES = [
     category: 'Bloqueio',
     subcategory: 'Mu Torere',
     origin: 'Nova Zelândia (Maori)',
-    description: 'Fase de colocação seguida de movimentação. Bloqueie o adversário.',
-    available: false,
+    description: 'Fase de colocação (4 peças cada), depois movimentação pelas linhas. Quem não conseguir mover perde.',
+    available: true,
+    moduleLoader: () => import('./Game12.js'),
   },
   {
     id: 'mu-torere-3',
@@ -153,8 +162,9 @@ export const GAMES = [
     category: 'Bloqueio',
     subcategory: 'Mu Torere',
     origin: 'Nova Zelândia (Maori)',
-    description: 'Posição inicial original do Mu Torere com regra especial nos dois primeiros lances.',
-    available: false,
+    description: 'Posição inicial alternada. Nos primeiros 2 lances de cada jogador, é proibido mover para o centro.',
+    available: true,
+    moduleLoader: () => import('./Game13.js'),
   },
 
   // ─── BLOQUEIO: Amazonas ─────────────────────────────────────

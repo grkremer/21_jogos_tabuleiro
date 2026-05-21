@@ -20,6 +20,7 @@ const BOARD_LINES = [
 const PIECE_R  = 22;
 const SNAP_R   = 36; // snap radius when releasing drag near a point
 const DRAG_R   = 20; // ghost piece radius (slightly smaller)
+const HIT_R    = 36; // hit target radius for placement phase clicks
 
 function el(tag, attrs) {
   const e = document.createElementNS(NS, tag);
@@ -167,8 +168,22 @@ export function renderTapatanBoard(state, result, onPositionClick, uiState = {})
     }));
   }
 
-  // ── Interaction (drag + click) ────────────────────────────────
-  if (onPositionClick && !result.over) {
+  // ── Placement phase: click on empty positions ─────────────────
+  if (uiState.phase === 'placement' && onPositionClick && !result.over) {
+    for (let i = 0; i < 9; i++) {
+      if (state.board[i] !== 0) continue;
+      const [cx, cy] = PTS[i];
+      const hit = el('circle', { cx, cy, r: HIT_R, fill: 'rgba(0,0,0,0)', 'pointer-events': 'all' });
+      hit.style.cursor = 'pointer';
+      hit.addEventListener('mouseenter', () => hit.setAttribute('fill', 'rgba(255,255,255,0.12)'));
+      hit.addEventListener('mouseleave', () => hit.setAttribute('fill', 'rgba(0,0,0,0)'));
+      hit.addEventListener('click', () => onPositionClick(i));
+      svg.appendChild(hit);
+    }
+  }
+
+  // ── Movement phase: drag + click interaction ──────────────────
+  if (!uiState.phase && onPositionClick && !result.over) {
     attachInteraction(svg, state, onPositionClick, getValidDestsFor, validDests, selectedPiece);
   }
 

@@ -125,7 +125,7 @@ Peças já posicionadas na posição inicial. Nenhuma colocação — só movime
 
 ---
 
-### Jogo 4 — Shisima
+### Jogo 4 — Shisima ✅ implementado
 
 - **Origem:** Quênia
 - **Peças por jogador:** 3
@@ -147,7 +147,7 @@ const WIN_LINES_SHISIMA = [
 
 ---
 
-### Jogo 5 — Tsoro Yematatu
+### Jogo 5 — Tsoro Yematatu ✅ implementado
 
 - **Origem:** Zimbábue
 - **Peças por jogador:** 3
@@ -184,7 +184,7 @@ Dois estados de jogo: **fase de colocação** → **fase de movimentação**.
 
 A transição `placement → movement` ocorre quando ambos os jogadores colocaram todas as suas peças.
 
-### Jogo 6 — Colocação + Livre
+### Jogo 6 — Colocação + Livre ✅ implementado
 
 - **Origem:** —
 - **Peças por jogador:** 3
@@ -200,7 +200,7 @@ A transição `placement → movement` ocorre quando ambos os jogadores colocara
 
 ---
 
-### Jogo 7 — Achi (4 peças)
+### Jogo 7 — Achi (4 peças) ✅ implementado
 
 - **Origem:** Gana
 - **Peças por jogador:** 4 (8 peças no tabuleiro + 1 vazia durante movimentação!)
@@ -213,7 +213,7 @@ A transição `placement → movement` ocorre quando ambos os jogadores colocara
 
 ---
 
-### Jogo 8 — Achi (3 peças)
+### Jogo 8 — Achi (3 peças) ✅ implementado
 
 - **Origem:** Gana
 - **Peças por jogador:** 3
@@ -226,7 +226,7 @@ A transição `placement → movement` ocorre quando ambos os jogadores colocara
 
 ---
 
-### Jogo 9 — Colocação + Centro
+### Jogo 9 — Colocação + Centro ✅ implementado
 
 - **Origem:** —
 - **Peças por jogador:** 3
@@ -239,7 +239,7 @@ WIN_LINES: `[3,4,5], [1,4,7], [0,4,8], [2,4,6]` (igual ao Shisima)
 
 ---
 
-### Jogo 10 — Colocação + Salto
+### Jogo 10 — Colocação + Salto ✅ implementado
 
 - **Origem:** Zimbábue (estilo Tsoro)
 - **Peças por jogador:** 3
@@ -273,7 +273,7 @@ P1  P2  P1        1  2  1
 
 ---
 
-### Jogo 11 — Mu Torere (V1 — Alternado)
+### Jogo 11 — Mu Torere (V1 — Alternado) ✅ implementado
 
 - **Origem:** Nova Zelândia (Maori)
 - **Peças por jogador:** 4
@@ -285,7 +285,7 @@ P1  P2  P1        1  2  1
 
 ---
 
-### Jogo 12 — Mu Torere (V2 — Colocação + Movimentação)
+### Jogo 12 — Mu Torere (V2 — Colocação + Movimentação) ✅ implementado
 
 - **Origem:** Nova Zelândia (Maori)
 - **Peças por jogador:** 4
@@ -295,11 +295,17 @@ P1  P2  P1        1  2  1
 
 ---
 
-### Jogo 13 — Mu Torere (V3 — Original)
+### Jogo 13 — Mu Torere (V3 — Original) ✅ implementado
 
 - **Origem:** Nova Zelândia (Maori)
 - **Peças por jogador:** 4
-- **Posição inicial:** Alternada (igual ao V1)
+- **Posição inicial:** P1 (branco) forma um Γ à direita, P2 (escuro) forma um L à esquerda, centro vazio:
+  ```
+  B B W     2  2  1
+  B . W  →  2  0  1
+  B W W     2  1  1
+  ```
+  P1 em: `2, 5, 7, 8` — P2 em: `0, 1, 3, 6`
 - **Regra especial:** Nas **duas primeiras jogadas** de cada jogador, não é permitido mover ao centro
 - **Mecânica:** Após as 4 primeiras jogadas, segue as regras do V1
 - **Vitória:** Adversário não consegue mover
@@ -465,19 +471,22 @@ Puzzles de 1 jogador: mova as peças no **menor número de movimentos** possíve
 ```
 GameBase
 ├── TicTacToe                     (Jogo 1)
-├── MovementGameBase              (Jogos 2–5)
+├── MovementGameBase              (Jogos 2–5) ✅
 │   ├── MovimentoLivre            (Jogo 2)
 │   ├── Tapatan                   (Jogo 3)
 │   ├── Shisima                   (Jogo 4)
 │   └── TsoroYematatu             (Jogo 5)
-├── PlacementMovementBase         (Jogos 6–10, a criar)
+├── PlacementMovementBase         (Jogos 6–10) ✅
 │   ├── ColMaisLivre              (Jogo 6)
 │   ├── Achi4                     (Jogo 7)
 │   ├── Achi3                     (Jogo 8)
 │   ├── ColMaisCentro             (Jogo 9)
 │   └── ColMaisSalto              (Jogo 10)
-├── MuTorereBase                  (Jogos 11–13, a criar)
-└── AmazonasBase                  (Jogos 14–17, a criar)
+├── BlockingGameBase              (Jogos 11–13) ✅
+│   ├── MuTorereV1                (Jogo 11)
+│   ├── MuTorereV2                (Jogo 12 — placement phase + movement)
+│   └── MuTorereV3                (Jogo 13 — restricted center moves)
+└── AmazonasBase                  (Jogos 14–17, a implementar)
 ```
 
 ### Renderers sugeridos

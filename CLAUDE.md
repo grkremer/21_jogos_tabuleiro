@@ -22,16 +22,17 @@ python -m http.server 8080
 Single-page app with three screens (`#screen-home`, `#screen-setup`, `#screen-game`), all in `index.html`. The entry point is `js/app.js` (ES module). No framework, no bundler.
 
 ```
-css/style.css                  — dark theme, CSS custom properties, all layout
-js/app.js                      — screen manager, game loop, AI scheduling, move handling
-js/engine/GameBase.js          — abstract base class all games extend
-js/engine/MinimaxAI.js         — generic alpha-beta minimax (works with any GameBase)
-js/games/registry.js           — GAMES array (21 entries) + BONUS_GAMES + CATEGORIES
-js/games/TicTacToe.js          — Game 1: placement only
-js/games/MovementGameBase.js   — shared base for movement games (pre-positioned board)
-js/games/TapatanBoardRenderer.js — SVG renderer for the 9-point Tapatan board
-js/games/Game2.js              — Game 2: Movimento Livre (free movement)
-js/games/Game3.js              — Game 3: Tapatan (adjacent movement)
+css/style.css                    — dark theme, CSS custom properties, all layout
+js/app.js                        — screen manager, game loop, AI scheduling, move handling
+js/engine/GameBase.js            — abstract base class all games extend
+js/engine/MinimaxAI.js           — generic alpha-beta minimax (works with any GameBase)
+js/games/registry.js             — GAMES array (21 entries) + BONUS_GAMES + CATEGORIES
+js/games/TapatanBoardRenderer.js — SVG renderer reused by all 9-point board games
+js/games/MovementGameBase.js     — base for pre-positioned movement games (Games 2–5)
+js/games/PlacementMovementBase.js — base for two-phase placement→movement games (Games 6–10)
+js/games/BlockingGameBase.js     — base for blocking games / Mu Torere (Games 11–13)
+js/games/TicTacToe.js            — Game 1
+js/games/Game2.js–Game13.js      — Games 2–13 (all implemented)
 ```
 
 Games are loaded lazily via `moduleLoader: () => import('./GameX.js')` in registry.js.
@@ -60,6 +61,7 @@ Add entry in `registry.js` with `available: true` and `moduleLoader`.
 
 - **`'placement'`** (default): `clickHandler` receives a cell index. `handleCellClick` in app.js validates against `getValidMoves`.
 - **`'movement'`**: declare `get interactionMode() { return 'movement'; }` on the game class. app.js uses `handlePositionClick` — a two-click model (first click selects piece, second click moves to valid destination). `state.selectedPiece` and `state.validDests` are maintained in app.js and passed as `uiState` to the renderer.
+- **Dynamic mode**: implement `getInteractionMode(state)` to switch modes based on game state (e.g., `PlacementMovementBase` returns `state.phase` to switch from `'placement'` to `'movement'` mid-game). app.js calls `getCurrentInteractionMode()` which prefers this method over the static `interactionMode` getter.
 
 ## Movement Game Board (Tapatan/9-point)
 
