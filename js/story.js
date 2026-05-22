@@ -93,6 +93,23 @@ export function showStoryScreen() {
   }
 }
 
+// Distância de cada nó em relação à borda (px).
+// Itens pares = esquerda (padding-left), ímpares = direita (padding-right).
+// Variação orgânica: cria um caminho sinuoso em vez de duas colunas rígidas.
+const NODE_EDGE_PAD = [
+  18, 22,   //  1-2  (próximos à borda)
+  52, 30,   //  3-4
+  85, 65,   //  5-6  (mais ao centro)
+  35, 80,   //  7-8
+  20, 55,   //  9-10
+  72, 25,   // 11-12
+  60, 88,   // 13-14
+  30, 45,   // 15-16
+  78, 20,   // 17-18
+  58, 40,   // 19-20
+  70,       // 21
+];
+
 // ── Renderização do mapa ──────────────────────────────────────
 function _renderMap() {
   const p = loadProgress();
@@ -109,9 +126,12 @@ function _renderMap() {
     const easyDone  = p.completedEasy.includes(lv);
     const isCurrent = unlocked && !medDone && lv === p.unlockedUpTo;
 
-    // Item wrapper (alternates left/right for zigzag feel)
+    // Item wrapper — alterna esquerda/direita; padding varia por nó para caminho orgânico
+    const isLeft = i % 2 === 0;
     const item = document.createElement('div');
-    item.className = 'story-item ' + (i % 2 === 0 ? 'item-left' : 'item-right');
+    item.className = 'story-item ' + (isLeft ? 'item-left' : 'item-right');
+    const pad = NODE_EDGE_PAD[i] ?? 30;
+    item.style[isLeft ? 'paddingLeft' : 'paddingRight'] = pad + 'px';
 
     // Node button
     const node = document.createElement('button');
@@ -140,7 +160,10 @@ function _renderMap() {
 
     // Label
     const label = document.createElement('div');
-    label.className = 'story-label' + (!unlocked ? ' label-locked' : '');
+    label.className = 'story-label' + (
+      !unlocked  ? ' label-locked'  :
+      isCurrent  ? ' label-current' : ''
+    );
     label.textContent = game.name;
     if (!game.available && unlocked) {
       const badge = document.createElement('span');
@@ -326,17 +349,38 @@ function _drawPath() {
     d += ` C ${prev.cx} ${cy1}, ${curr.cx} ${cy1}, ${curr.cx} ${curr.cy}`;
   }
 
-  // Background (gray) path — always drawn full length
-  const pathBg = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  pathBg.setAttribute('d', d);
-  pathBg.setAttribute('fill', 'none');
-  pathBg.setAttribute('stroke', 'rgba(255,255,255,0.06)');
-  pathBg.setAttribute('stroke-width', '10');
-  pathBg.setAttribute('stroke-linecap', 'round');
-  pathBg.setAttribute('stroke-linejoin', 'round');
-  svg.appendChild(pathBg);
+  function makePath(d, stroke, width, opacity = 1) {
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', d);
+    p.setAttribute('fill', 'none');
+    p.setAttribute('stroke', stroke);
+    p.setAttribute('stroke-width', String(width));
+    p.setAttribute('stroke-linecap', 'round');
+    p.setAttribute('stroke-linejoin', 'round');
+    if (opacity < 1) p.setAttribute('opacity', String(opacity));
+    return p;
+  }
 
-  // Active (colored) path — up to last unlocked node
+  // Defs for gradient
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  const grad = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+  grad.setAttribute('id', 'pathGrad');
+  grad.setAttribute('x1', '0'); grad.setAttribute('y1', '0');
+  grad.setAttribute('x2', '0'); grad.setAttribute('y2', '1');
+  grad.setAttribute('gradientUnits', 'objectBoundingBox');
+  [['0%','#5b21b6'],['50%','#7c3aed'],['100%','#9d5cf7']].forEach(([off, col]) => {
+    const s = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+    s.setAttribute('offset', off); s.setAttribute('stop-color', col);
+    grad.appendChild(s);
+  });
+  defs.appendChild(grad);
+  svg.appendChild(defs);
+
+  // Full background track (locked portion)
+  svg.appendChild(makePath(d, 'rgba(255,255,255,0.05)', 14));
+  svg.appendChild(makePath(d, 'rgba(255,255,255,0.03)', 10));
+
+  // Active (colored) track — up to last unlocked node
   const lastActive = pts.reduce((acc, p, i) => p.active ? i : acc, -1);
   if (lastActive > 0) {
     let da = `M ${pts[0].cx} ${pts[0].cy}`;
@@ -346,28 +390,12 @@ function _drawPath() {
       const cy1  = prev.cy + (curr.cy - prev.cy) * 0.5;
       da += ` C ${prev.cx} ${cy1}, ${curr.cx} ${cy1}, ${curr.cx} ${curr.cy}`;
     }
-    const pathFg = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    pathFg.setAttribute('d', da);
-    pathFg.setAttribute('fill', 'none');
-    pathFg.setAttribute('stroke', 'url(#pathGrad)');
-    pathFg.setAttribute('stroke-width', '10');
-    pathFg.setAttribute('stroke-linecap', 'round');
-    pathFg.setAttribute('stroke-linejoin', 'round');
-
-    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-    const grad = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
-    grad.setAttribute('id', 'pathGrad');
-    grad.setAttribute('x1', '0'); grad.setAttribute('y1', '0');
-    grad.setAttribute('x2', '0'); grad.setAttribute('y2', '1');
-    grad.setAttribute('gradientUnits', 'objectBoundingBox');
-    const s1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-    s1.setAttribute('offset', '0%');   s1.setAttribute('stop-color', '#7c3aed');
-    const s2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-    s2.setAttribute('offset', '100%'); s2.setAttribute('stop-color', '#9d5cf7');
-    grad.appendChild(s1); grad.appendChild(s2);
-    defs.appendChild(grad);
-    svg.insertBefore(defs, svg.firstChild);
-    svg.appendChild(pathFg);
+    // Outer glow
+    svg.appendChild(makePath(da, 'rgba(124,58,237,0.18)', 22));
+    // Main colored track
+    svg.appendChild(makePath(da, 'url(#pathGrad)', 14));
+    // Inner highlight
+    svg.appendChild(makePath(da, 'rgba(200,180,255,0.2)', 6));
   }
 
   mapEl.insertBefore(svg, mapEl.firstChild);
