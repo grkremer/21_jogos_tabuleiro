@@ -267,23 +267,22 @@ function showStoryWinOverlay(result) {
         document.getElementById('sw-next').addEventListener('click', leaveStory);
       }
     } else {
+      // Vencer no fácil também avança de fase
       emoji.textContent    = '🌱';
-      title.textContent    = 'Bom treino!';
-      subtitle.textContent = 'Derrote a IA no médio para avançar ao próximo nível.';
+      title.textContent    = `Nível ${level} concluído!`;
+      subtitle.textContent = 'Você venceu! Próximo nível desbloqueado.';
+
+      document.getElementById('story-win-code-value').textContent = generateCode(level);
+      codeBlock.style.display = 'block';
+
+      const hasNext = level < 21 && progress.unlockedUpTo > level && GAMES.find(g => g.num === level + 1);
       storyActions.innerHTML = `
-        <button class="btn-primary" id="sw-medium">⚡ Tentar no Médio</button>
+        ${hasNext ? `<button class="btn-primary" id="sw-next">Próximo Nível ›</button>` : ''}
         <button class="btn-secondary" id="sw-map">Voltar ao Mapa</button>
       `;
-      document.getElementById('sw-medium').addEventListener('click', () => {
-        overlay.classList.remove('visible');
-        state.story.difficulty = 'medium';
-        state.difficulty = 'medium';
-        const diff = DIFFICULTY['medium'];
-        state.ai = new MinimaxAI(state.gameInstance, diff.depth, diff.randomize);
-        state.score  = { 1: 0, 2: 0, draw: 0 };
-        updateScoreDisplay();
-        startRound();
-      });
+      if (hasNext) {
+        document.getElementById('sw-next').addEventListener('click', leaveStory);
+      }
     }
   } else {
     emoji.textContent    = isDraw ? '🤝' : '💪';
