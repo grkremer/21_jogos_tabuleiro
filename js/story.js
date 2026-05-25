@@ -39,7 +39,7 @@ export function markCompleted(level, difficulty) {
   const p = loadProgress();
   const key = difficulty === 'medium' ? 'completedMedium' : 'completedEasy';
   if (!p[key].includes(level)) p[key].push(level);
-  if (difficulty === 'medium' && level >= p.unlockedUpTo)
+  if (level >= p.unlockedUpTo)
     p.unlockedUpTo = Math.min(level + 1, 21);
   saveProgress(p);
   return p;
