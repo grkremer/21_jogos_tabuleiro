@@ -87,6 +87,6 @@ export class MinimaxAI {
 /** Difficulty presets */
 export const DIFFICULTY = {
   easy:   { depth: 1, label: 'Fácil',  icon: '🌱', randomize: true  },
-  medium: { depth: 4, label: 'Médio',  icon: '⚡', randomize: true  },
+  medium: { depth: 3, label: 'Médio',  icon: '⚡', randomize: true  },
   hard:   { depth: 9, label: 'Difícil', icon: '💀', randomize: false },
 };
